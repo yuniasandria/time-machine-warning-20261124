@@ -20,6 +20,10 @@ def main() -> None:
         raise SystemExit(f"label is {len(label)} chars, must be 1-120")
     if "\n" in label or "\r" in label:
         raise SystemExit("label must be a single line")
+    # Reject any other control characters too: a label must be plain
+    # printable text, so a stray tab/escape can never slip into the file.
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in label):
+        raise SystemExit("label must not contain control characters")
     label.encode("utf-8")  # must be valid UTF-8 text
 
     out_dir = os.environ.get("OUTPUT_DIR", "/output")
